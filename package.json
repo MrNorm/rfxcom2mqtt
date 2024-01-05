@@ -6,7 +6,7 @@
   "main": "rfxcom2mqtt.js",
   "dependencies": {
     "mqtt": "^4.3.7",
-    "rfxcom": "^2.4.1",
+    "rfxcom": "^2.6.0",
     "node-config-yaml": "^0.1.4",
     "node-cron": "^3.0.2"
   },
