@@ -25,30 +25,23 @@ rfxcom:
     - security1
 
 devices:
-  - id: '0x5C02'
-
-  - id: '0xB9459A'
-
   - id: '1001010/1'
     friendlyName: 'CucuDimmer'
 
   - id: '0x012E00FF'
     friendlyName: 'Living Room switch'
 
-  - id: '0x00ED400F'
-    friendlyName: 'Lights'
-    units:
-      - unitCode: '1'
-        friendlyName: 'Light1'
-      - unitCode: '2'
-        friendlyName: 'Light2'
-      - unitCode: '3'
-        friendlyName: 'Light3'
-      - unitCode: '4'
-        friendlyName: 'Light4'
+  - id: '0x00ED400F/1'
+    friendlyName: 'Light 1'
+
+  - id: '0x00ED400F/2'
+    friendlyName: 'Light 2'
+
+  - id: '0x00ED400F/3'
+    friendlyName: 'Light 3'
 
   - id: '0x3D090F'
     friendlyName: 'Switch1'
     
   - id: '0x3D090E'
-    friendlyName: 'Switch1'
+    friendlyName: 'Switch2'
