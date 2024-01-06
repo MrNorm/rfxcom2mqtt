@@ -46,7 +46,12 @@ devices:
     friendlyName: 'Switch2'
     repetitions: 1
 
-  - id: '071a000000000a03'
+  - friendlyName: '071a000000000a03'
+    id: [
+      "1a",
+      "0",
+      "00000a:3"
+    ]
     options: {
       'venetian_blind_mode': 'US'
     }
