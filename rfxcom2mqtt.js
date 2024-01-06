@@ -169,7 +169,7 @@ mqttClient.on('message', (topic, message) => {
 
   // We may also get a value from the payload to use in the device function
   const value = payload.value;
-  const deviceOptions = payload.deviceOptions;
+  let deviceOptions = payload.deviceOptions;
 
   // Get device config if available
   const deviceConf = config.devices.find((dev) => dev.friendlyName === entityName);
