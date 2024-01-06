@@ -110,9 +110,6 @@ const sendToMQTT = function (type, evt) {
 // RFXCOM Init
 var rfxdebug = (config.rfxcom.debug) ? config.rfxcom.debug : false;
 var rfxtrx = new rfxcom.RfxCom(config.rfxcom.usbport, { debug: rfxdebug });
-var lighting2 = new rfxcom.Lighting2(rfxtrx, rfxcom.lighting2['AC']);
-var lighting4 = new rfxcom.Lighting4(rfxtrx, rfxcom.lighting4.PT2262);
-var chime1 = new rfxcom.Chime1(rfxtrx, rfxcom.chime1.SELECT_PLUS);
 
 rfxtrx.initialise(function (error) {
 	if (error) {
@@ -128,7 +125,7 @@ mqttClient.on('message', (topic, payload) => {
 		console.log('MQTT in:', topic, " ", payload.toString())
 	}
 
-	var deviceName = "";
+	var entityName = "";
 	var unitName = "";
 	const dn = topic.split("/");
 	if (dn[0] != "rfxcom2mqtt") {
@@ -139,69 +136,61 @@ mqttClient.on('message', (topic, payload) => {
 		console.log("Topic Error, should start with rfxcom2mqtt/command");
 		return;
 	}
-	deviceName = dn[2];
-	if (dn.length > 3 && dn[3].length > 0) {
-		unitName = dn[3];
+	if (!validRfxcomDevice(dn[2])) {
+		console.log(dn[2], " is not a valid device");
+		return;
+	}
+	if (!validRfxcomDeviceFunction(dn[2], dn[3])) {
+		console.log(dn[3], " is not a valid device function on ", dn[2]);
+		return;
 	}
 
-	var command = payload.toString().trim().toLowerCase();
-
-	var deviceId = "";
-	var deviceType = "";
-	var unitCode = "";
-	// Get device from config
-	try {
-		var deviceConf = config.devices.find(dev => dev.name === deviceName && (dev.command ? dev.command === command : true));
-		// console.log("Device:", deviceName);
-		deviceId = deviceConf.id;
-		deviceType = deviceConf.type
-		if (unitName) {
-			// console.log("UnitName:", unitName);
-			var unitConf = deviceConf.units.find(unit => unit.name === unitName);
-			unitCode = unitConf.unitCode
-			// console.log("UnitCode:", unitCode);
-			if (unitCode) {
-				deviceId = deviceId + "/" + unitCode;
-			}
-		}
-	} catch {
-		console.log("Unknown Device:", deviceName, " unitCode:", unitCode);
+	deviceType = dn[2];
+	deviceFunction = dn[3];
+	entityName = dn[4];
+	
+	// Used for units and forms part of the device id
+	if (dn.length > 3 && dn[5].length > 0) {
+		entityName = entityName + dn[5];
 	}
 
-	if (deviceType) {
-		const repeat = (config.rfxcom.transmit.repeat) ? config.rfxcom.transmit.repeat : 1
-		for (var i = 0; i < repeat; i++) {
-			if (deviceType === "lighting2") {
-				const cmd = command.split(" ")
-				if (cmd[0] === "group") {
-					unitCode = "0";
-					command = cmd[1];
-				}
-				// console.log("deviceId:", deviceId, "command:", command);
-				// Lighting2 Command: on, off or level x
-				if (command === "on") {
-					lighting2.switchOn(deviceId);
-				} else if (command === "off") {
-					lighting2.switchOff(deviceId);
-				} else {
-					if (cmd[0] === "level") {
-						lighting2.setLevel(deviceId, cmd[1]);
-					}
-				}
-			}
-			if (deviceType === "lighting4") {
-				lighting4.sendData(deviceId);
-			}
-			if (deviceType === "chime1") {
-				chime1.chime(deviceId);
-			}
-			if (debug) {
-				console.log(deviceType, deviceName, deviceId, "["+command+"]");
-			}
-			sleep(100);
+	// We will need subType from payload
+	if (payload.subType === undefined)
+		throw new Error("subType not found in message/payload");
+
+	// We may also get a value from the payload to use in the device function
+	var value = payload.value;
+
+	// Get device config if available
+	var deviceConf = config.devices.find(dev => dev.friendlyName === entityName);
+	if (deviceConf instanceof Object) {
+		if (deviceConf.id !== undefined)
+			entityName = deviceConf.id;
+
+		if (deviceConf.type !== undefined) {
+			if (!validRfxcomDevice(deviceConf.type))
+				throw new Error(deviceConf.type + " not found in config");
+
+			deviceType = deviceConf.type;
 		}
-	} else {
-		console.log("No DeviceType, cannot transmit command to ", deviceName);
+	}
+
+	// Instantiate the device class
+	var device = new rfxcom[deviceType](rfxtrx, payload.subType);
+
+	const repeat = (config.rfxcom.transmit.repeat) ? config.rfxcom.transmit.repeat : 1
+	for (var i = 0; i < repeat; i++) {
+		// Execute the command with optional value
+		if (value) {
+			device[deviceFunction](entityName, value);
+		} else {
+			device[deviceFunction](entityName);
+		}
+
+		if (debug) {
+			console.log(deviceType, deviceType, entityName, "["+deviceFunction+"]["+value+"]");
+		}
+		sleep(100);
 	}
 })
 
