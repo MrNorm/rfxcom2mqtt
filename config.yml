@@ -26,43 +26,29 @@ rfxcom:
 
 devices:
   - id: '0x5C02'
-    title: 'Bathroom Temp & Hum'
 
   - id: '0xB9459A'
-    title: 'Garden motion'
 
   - id: '1001010/1'
-    name: 'CucuDimmer'
-    title: 'Kitchen Dimmer Light'
-    type: 'lighting2'
+    friendlyName: 'CucuDimmer'
 
   - id: '0x012E00FF'
-    name: 'Living Room switch'
+    friendlyName: 'Living Room switch'
 
   - id: '0x00ED400F'
-    name: 'Lights'
+    friendlyName: 'Lights'
     units:
       - unitCode: '1'
-        name: 'Light1'
-        title: 'Living Room'
+        friendlyName: 'Light1'
       - unitCode: '2'
-        name: 'Light2'
-        title: 'Kitchen'
+        friendlyName: 'Light2'
       - unitCode: '3'
-        name: 'Light3'
-        title: 'Garage'
+        friendlyName: 'Light3'
       - unitCode: '4'
-        name: 'Light4'
-        title: 'Garden'
-    type: 'lighting2'
+        friendlyName: 'Light4'
 
   - id: '0x3D090F'
-    name: 'Switch1'
-    command: 'on'
-    title: 'Living Room Lights on'
-    type: 'lighting4'
+    friendlyName: 'Switch1'
+    
   - id: '0x3D090E'
-    name: 'Switch1'
-    command: 'off'
-    title: 'Living Room Lights off'
-    type: 'lighting4'
+    friendlyName: 'Switch1'
