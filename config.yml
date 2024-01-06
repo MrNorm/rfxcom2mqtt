@@ -12,8 +12,6 @@ mqtt:
 rfxcom:
   usbport: /dev/ttyUSB0
   debug: false
-  transmit:
-    repeat: 4
   receive:
     - temperaturehumidity1
     - homeconfort
@@ -46,6 +44,7 @@ devices:
     
   - id: '0x3D090E'
     friendlyName: 'Switch2'
+    repetitions: 1
 
   - id: '071a000000000a03'
     options: {

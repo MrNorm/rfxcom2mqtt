@@ -123,6 +123,8 @@ rfxtrx.initialise(function(error) {
 
 // RFXCOM Transmit
 mqttClient.on('message', (topic, payload) => {
+  let transmitRepetitions;
+
   if (debug) {
     console.log('MQTT in:', topic, ' ', payload.toString());
   }
@@ -182,6 +184,10 @@ mqttClient.on('message', (topic, payload) => {
     if (deviceConf.options !== undefined) {
       deviceOptions = deviceConf.options;
     }
+
+    if (deviceConf.repetitions !== undefined) {
+      transmitRepetitions = deviceConf.repetitions;
+    }
   }
 
   // Instantiate the device class
@@ -192,7 +198,7 @@ mqttClient.on('message', (topic, payload) => {
     device = new rfxcom[deviceType](rfxtrx, payload.subType);
   }
 
-  const repeat = (config.rfxcom.transmit.repeat) ? config.rfxcom.transmit.repeat : 1;
+  const repeat = (transmitRepetitions) ? transmitRepetitions : 1;
   for (let i = 0; i < repeat; i++) {
     // Execute the command with optional value
     if (value) {
