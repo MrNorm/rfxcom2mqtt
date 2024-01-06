@@ -18,6 +18,20 @@ if (debug) {
 	console.log(config);
 }
 
+const validRfxcomDevice = (device) => {
+	const rfxcomDevices = Object.keys(rfxcom);
+
+	return (rfxcomDevices.find((rfxcomDevice) => device === rfxcomDevice) !== undefined);
+}
+
+const validRfxcomDeviceFunction = (device, deviceFunction) => {
+	if(rfxcom[device] === undefined)
+		return false;
+
+	const deviceFunctions = Object.getOwnPropertyNames(rfxcom[device].prototype);
+	return (deviceFunctions.find((rfxcomDeviceFunction) => rfxcomDeviceFunction === deviceFunction) !== undefined);
+}
+
 const will = { "topic": topic_will, "payload": "offline", "retain": "true" }
 const options = { "will": will }
 if (config.mqtt.username) {
@@ -91,8 +105,7 @@ const sendToMQTT = function (type, evt) {
 // RFXCOM Init
 var rfxdebug = (config.rfxcom.debug) ? config.rfxcom.debug : false;
 var rfxtrx = new rfxcom.RfxCom(config.rfxcom.usbport, { debug: rfxdebug });
-// TODO: transmit protocols
-// rfxcom.lighting2[evt.subtype]
+
 var lighting2 = new rfxcom.Lighting2(rfxtrx, rfxcom.lighting2['AC']);
 var lighting4 = new rfxcom.Lighting4(rfxtrx, rfxcom.lighting4.PT2262);
 var chime1 = new rfxcom.Chime1(rfxtrx, rfxcom.chime1.SELECT_PLUS);
