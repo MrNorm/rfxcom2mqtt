@@ -154,6 +154,7 @@ mqttClient.on('message', (topic, payload) => {
   const deviceFunction = dn[3];
   let deviceType = dn[2];
   let entityName = dn[4];
+  let subType;
 
   // Used for units and forms part of the device id
   if (dn[5] !== undefined && dn[5].length > 0) {
@@ -161,9 +162,8 @@ mqttClient.on('message', (topic, payload) => {
   }
 
   // We will need subType from payload
-  if (payload.subType === undefined) {
-    throw new Error('subType not found in message/payload');
-  }
+  if (payload.subType !== undefined) {
+    subType = payload.subType;
 
   // We may also get a value from the payload to use in the device function
   const value = payload.value;
@@ -178,7 +178,7 @@ mqttClient.on('message', (topic, payload) => {
 
     if (deviceConf.type !== undefined) {
       if (!validRfxcomDevice(deviceConf.type)) {
-        throw new Error(deviceConf.type + ' not found in config');
+        throw new Error(deviceConf.type + ' from config: not a valid device');
       }
 
       deviceType = deviceConf.type;
@@ -188,10 +188,17 @@ mqttClient.on('message', (topic, payload) => {
       deviceOptions = deviceConf.options;
     }
 
+    if (deviceConf.subType !== undefined) {
+      subType = deviceConf.subType;
+    }
+
     if (deviceConf.repetitions !== undefined) {
       transmitRepetitions = deviceConf.repetitions;
     }
   }
+
+  if (subType === undefined)
+    throw new Error('Subtype not defined in payload or config');
 
   // Instantiate the device class
   let device;
