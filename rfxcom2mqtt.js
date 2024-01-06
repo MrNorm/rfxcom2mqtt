@@ -156,7 +156,7 @@ mqttClient.on('message', (topic, payload) => {
   let entityName = dn[4];
 
   // Used for units and forms part of the device id
-  if (dn.length > 3 && dn[5].length > 0) {
+  if (dn.length >= 5 && dn[5].length > 0) {
     entityName = entityName + dn[5];
   }
 
