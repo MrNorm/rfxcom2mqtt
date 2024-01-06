@@ -18,10 +18,12 @@ if (debug) {
 	console.log(config);
 }
 
-const validRfxcomDevice = (device) => {
-	const rfxcomDevices = Object.keys(rfxcom);
+const getRfxcomDevices = () => {
+	return rfxcomDevices = Object.keys(rfxcom);
+}
 
-	return (rfxcomDevices.find((rfxcomDevice) => device === rfxcomDevice) !== undefined);
+const validRfxcomDevice = (device) => {
+	return (getRfxcomDevices().find((rfxcomDevice) => device === rfxcomDevice) !== undefined);
 }
 
 const validRfxcomDeviceFunction = (device, deviceFunction) => {
@@ -202,11 +204,19 @@ mqttClient.on('message', (topic, payload) => {
 })
 
 
-// RFXCOM Receive
 if (config.rfxcom.receive) {
-	config.rfxcom.receive.forEach(function (protocol) {
-		rfxtrx.on(protocol, function (evt) { sendToMQTT(protocol, evt) });
+	// Subscribe to specific rfxcom events
+	config.rfxcom.receive.forEach((protocol) => {
+		if(!validRfxcomDevice(protocol))
+			throw new Error(protocol + " is not a valid device name")
+
+		rfxtrx.on(protocol, (evt) => { sendToMQTT(protocol, evt) });
 	});
+} else {
+	// Subscribe to all available rfxcom events
+	getRfxcomDevices().forEach((device) => {
+		rfxtrx.on(device, (evt) => { sendToMQTT(device, evt) });
+	})
 }
 
 // RFXCOM Status
