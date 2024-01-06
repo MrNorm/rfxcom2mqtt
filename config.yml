@@ -1,4 +1,4 @@
-debug: true
+debug: false
 healthcheck: true
 
 mqtt:
@@ -33,6 +33,7 @@ devices:
 
   - id: '0x00ED400F/1'
     friendlyName: 'Light 1'
+    type: lighting1
 
   - id: '0x00ED400F/2'
     friendlyName: 'Light 2'
