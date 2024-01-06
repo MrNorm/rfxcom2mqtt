@@ -18,7 +18,6 @@ if (debug) {
 	console.log(config);
 }
 
-const rfxcomDevices = Object.keys(rfxcom);
 const will = { "topic": topic_will, "payload": "offline", "retain": "true" }
 const options = { "will": will }
 if (config.mqtt.username) {
@@ -33,7 +32,7 @@ if (config.mqtt.port) {
 
 var qos = 0
 if (config.mqtt.qos) {
-	qos = config.mqtt.qos;
+qos = config.mqtt.qos;
 }
 
 const mqttClient = mqtt.connect(config.mqtt.server + ':' + port, options)
