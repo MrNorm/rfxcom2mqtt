@@ -162,6 +162,7 @@ mqttClient.on('message', (topic, payload) => {
 
   // We may also get a value from the payload to use in the device function
   const value = payload.value;
+  const deviceOptions = payload.deviceOptions;
 
   // Get device config if available
   const deviceConf = config.devices.find((dev) => dev.friendlyName === entityName);
@@ -177,10 +178,19 @@ mqttClient.on('message', (topic, payload) => {
 
       deviceType = deviceConf.type;
     }
+
+    if (deviceConf.options !== undefined) {
+      deviceOptions = deviceConf.options;
+    }
   }
 
   // Instantiate the device class
-  const device = new rfxcom[deviceType](rfxtrx, payload.subType);
+  let device;
+  if (deviceOptions) {
+    device = new rfxcom[deviceType](rfxtrx, payload.subType, deviceOptions);
+  } else {
+    device = new rfxcom[deviceType](rfxtrx, payload.subType);
+  }
 
   const repeat = (config.rfxcom.transmit.repeat) ? config.rfxcom.transmit.repeat : 1;
   for (let i = 0; i < repeat; i++) {
