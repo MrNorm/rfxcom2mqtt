@@ -2,7 +2,7 @@
 
 const mqtt = require('mqtt');
 const rfxcom = require('rfxcom');
-const config = require('node-config-yaml').load("/app/data/config.yml");
+const config = require('node-config-yaml').load("./config.yml");
 const cron = require('node-cron');
 
 const topic = 'rfxcom2mqtt/devices';
@@ -18,22 +18,7 @@ if (debug) {
 	console.log(config);
 }
 
-const getRfxcomDevices = () => {
-	return rfxcomDevices = Object.keys(rfxcom);
-}
-
-const validRfxcomDevice = (device) => {
-	return (getRfxcomDevices().find((rfxcomDevice) => device === rfxcomDevice) !== undefined);
-}
-
-const validRfxcomDeviceFunction = (device, deviceFunction) => {
-	if(rfxcom[device] === undefined)
-		return false;
-
-	const deviceFunctions = Object.getOwnPropertyNames(rfxcom[device].prototype);
-	return (deviceFunctions.find((rfxcomDeviceFunction) => rfxcomDeviceFunction === deviceFunction) !== undefined);
-}
-
+const eventHandlers = [];
 const will = { "topic": topic_will, "payload": "offline", "retain": "true" }
 const options = { "will": will }
 if (config.mqtt.username) {
@@ -52,6 +37,29 @@ qos = config.mqtt.qos;
 }
 
 const mqttClient = mqtt.connect(config.mqtt.server + ':' + port, options)
+
+const getRfxcomDevices = () => {
+	return Object.keys(rfxcom);
+}
+
+const validRfxcomDevice = (device) => {
+	return (getRfxcomDevices().find((rfxcomDevice) => device === rfxcomDevice) !== undefined);
+}
+
+const validRfxcomDeviceFunction = (device, deviceFunction) => {
+	if (rfxcom[device] === undefined)
+		return false;
+
+	const deviceFunctions = Object.getOwnPropertyNames(rfxcom[device].prototype);
+	return (deviceFunctions.find((rfxcomDeviceFunction) => rfxcomDeviceFunction === deviceFunction) !== undefined);
+}
+
+const getDeviceConfig = (deviceId) => {
+	if (config.devices === undefined)
+		return;
+	
+	return config.devices.find(dev => dev.id === deviceId);
+}
 
 mqttClient.on('connect', () => {
 	console.log('Connected to MQTT')
@@ -72,14 +80,14 @@ mqttClient.on('connect', () => {
 const sendToMQTT = function (type, evt) {
 	evt.type = type;
 
-	var device = evt.id;
+	var deviceId = evt.id;
 	if (type === "lighting4") {
-		device = evt.data
+		deviceId = evt.data
 	}
 
-	// Get device name from config
-	try {
-		var deviceConf = config.devices.find(dev => dev.id === device);
+	// Get device config if available
+	var deviceConf = config.devices.find(dev => dev.id === deviceId);
+
 		device = deviceConf.name;
 		var title = deviceConf.title
 		if (title) {
@@ -89,25 +97,21 @@ const sendToMQTT = function (type, evt) {
 		if (command) {
 			evt.command = command
 		}
-	} catch {
-		console.log("Unknown Device: ", device);
-	}
 
 	var json = JSON.stringify(evt, null, 2)
-	mqttClient.publish(topic + "/" + device, json, { qos: qos, retain: config.mqtt.retain }, (error) => {
+	mqttClient.publish(topic + "/" + deviceId, json, { qos: qos, retain: config.mqtt.retain }, (error) => {
 		if (error) {
 			console.error(error)
 		}
 	})
 	if (debug) {
-		console.log('MQTT out:', topic + "/" + device, json.replace(/[\n\r][ ]*/g, ''));
+		console.log('MQTT out:', topic + "/" + deviceId, json.replace(/[\n\r][ ]*/g, ''));
 	}
 }
 
 // RFXCOM Init
 var rfxdebug = (config.rfxcom.debug) ? config.rfxcom.debug : false;
 var rfxtrx = new rfxcom.RfxCom(config.rfxcom.usbport, { debug: rfxdebug });
-
 var lighting2 = new rfxcom.Lighting2(rfxtrx, rfxcom.lighting2['AC']);
 var lighting4 = new rfxcom.Lighting4(rfxtrx, rfxcom.lighting4.PT2262);
 var chime1 = new rfxcom.Chime1(rfxtrx, rfxcom.chime1.SELECT_PLUS);
@@ -207,16 +211,8 @@ mqttClient.on('message', (topic, payload) => {
 if (config.rfxcom.receive) {
 	// Subscribe to specific rfxcom events
 	config.rfxcom.receive.forEach((protocol) => {
-		if(!validRfxcomDevice(protocol))
-			throw new Error(protocol + " is not a valid device name")
-
 		rfxtrx.on(protocol, (evt) => { sendToMQTT(protocol, evt) });
 	});
-} else {
-	// Subscribe to all available rfxcom events
-	getRfxcomDevices().forEach((device) => {
-		rfxtrx.on(device, (evt) => { sendToMQTT(device, evt) });
-	})
 }
 
 // RFXCOM Status
