@@ -69,6 +69,10 @@ mqttClient.on('connect', () => {
   });
 });
 
+mqttClient.on('error', (err) => {
+  console.error(err);
+});
+
 // MQTT Connect
 mqttClient.on('connect', () => {
   mqttClient.publish(topicWill, 'online', {qos: qos, retain: config.mqtt.retain}, (error) => {
@@ -129,7 +133,6 @@ mqttClient.on('message', (topic, payload) => {
     console.log('MQTT in:', topic, ' ', payload.toString());
   }
 
-  let entityName = '';
   const dn = topic.split('/');
   if (dn[0] != 'rfxcom2mqtt') {
     console.log('Topic Error, should start with rfxcom2mqtt');
@@ -148,9 +151,9 @@ mqttClient.on('message', (topic, payload) => {
     return;
   }
 
-  deviceType = dn[2];
-  deviceFunction = dn[3];
-  entityName = dn[4];
+  const deviceFunction = dn[3];
+  let deviceType = dn[2];
+  let entityName = dn[4];
 
   // Used for units and forms part of the device id
   if (dn.length > 3 && dn[5].length > 0) {
