@@ -164,6 +164,7 @@ mqttClient.on('message', (topic, payload) => {
   // We will need subType from payload
   if (payload.subType !== undefined) {
     subType = payload.subType;
+  }
 
   // We may also get a value from the payload to use in the device function
   const value = payload.value;
@@ -197,8 +198,9 @@ mqttClient.on('message', (topic, payload) => {
     }
   }
 
-  if (subType === undefined)
+  if (subType === undefined) {
     throw new Error('Subtype not defined in payload or config');
+  }
 
   // Instantiate the device class
   let device;
