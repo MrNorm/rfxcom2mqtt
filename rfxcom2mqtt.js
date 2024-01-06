@@ -250,10 +250,6 @@ rfxtrx.on("disconnect", function (evt) {
 	console.log("RFXCOM Disconnected");
 });
 
-function findDevice(device) {
-
-}
-
 function sleep(ms) {
 	return new Promise((resolve) => {
 		setTimeout(resolve, ms);
