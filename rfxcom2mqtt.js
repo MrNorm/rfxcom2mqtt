@@ -159,7 +159,7 @@ mqttClient.on('message', (topic, message) => {
 
   // Used for units and forms part of the device id
   if (dn[5] !== undefined && dn[5].length > 0) {
-    entityName = entityName + dn[5];
+    entityName = entityName + '/' + dn[5];
   }
 
   // We will need subType from payload
