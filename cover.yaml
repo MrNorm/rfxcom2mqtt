@@ -1,0 +1,23 @@
+mqtt:
+  cover:
+    - name: "Lounge - Blind Left (RFY)"
+      unique_id: lounge_blind_left_rfy
+      command_topic: "rfxcom2mqtt/command/Rfy/0x00000A/1"
+      payload_open:  "{ \"deviceFunction\": \"up\", \"subType\": \"RFY\", \"options\": { \"venetian_blind_mode\": \"US\" } }"
+      payload_close: "{ \"deviceFunction\": \"down\", \"subType\": \"RFY\", \"options\": { \"venetian_blind_mode\": \"US\" } }"
+      payload_stop:  "{ \"deviceFunction\": \"stop\", \"subType\": \"RFY\", \"options\": { \"venetian_blind_mode\": \"US\" } }"
+      optimistic: false
+    - name: "Lounge - Blind Middle (RFY)"
+      unique_id: lounge_blind_middle_rfy
+      command_topic: "rfxcom2mqtt/command/Rfy/0x00000A/2"
+      payload_open:  "{ \"deviceFunction\": \"up\", \"subType\": \"RFY\", \"options\": { \"venetian_blind_mode\": \"US\" } }"
+      payload_close: "{ \"deviceFunction\": \"down\", \"subType\": \"RFY\", \"options\": { \"venetian_blind_mode\": \"US\" } }"
+      payload_stop:  "{ \"deviceFunction\": \"stop\", \"subType\": \"RFY\", \"options\": { \"venetian_blind_mode\": \"US\" } }"
+      optimistic: false
+    - name: "Lounge - Blind Right (RFY)"
+      unique_id: lounge_blind_right_rfy
+      command_topic: "rfxcom2mqtt/command/Rfy/0x00000A/3"
+      payload_open:  "{ \"deviceFunction\": \"up\", \"subType\": \"RFY\", \"options\": { \"venetian_blind_mode\": \"US\" } }"
+      payload_close: "{ \"deviceFunction\": \"down\", \"subType\": \"RFY\", \"options\": { \"venetian_blind_mode\": \"US\" } }"
+      payload_stop:  "{ \"deviceFunction\": \"stop\", \"subType\": \"RFY\", \"options\": { \"venetian_blind_mode\": \"US\" } }"
+      optimistic: false
