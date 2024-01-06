@@ -31,6 +31,8 @@ Example JSON message on topic `"rfxcom2mqtt/devices/0x5C02"`:
 ## Publish command examples (topic/payload)
 
 #### With RFY blinds (Somfy)
+See `cover.yml` for an example of how to use this with Home Assistant
+
     rfxcom2mqtt/command/Rfy/0x00000A/1
     { "deviceFunction": "up", "subType": "RFY", "options": { "venetian_blind_mode": "US" } }
 
