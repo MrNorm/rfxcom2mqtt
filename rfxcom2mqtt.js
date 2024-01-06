@@ -78,6 +78,7 @@ mqttClient.on('connect', () => {
 })
 
 const sendToMQTT = function (type, evt) {
+	// Add type to event
 	evt.type = type;
 
 	var deviceId = evt.id;
@@ -85,21 +86,18 @@ const sendToMQTT = function (type, evt) {
 		deviceId = evt.data
 	}
 
+	// Define default topic entity
+	var topicEntity = deviceId
+
 	// Get device config if available
 	var deviceConf = config.devices.find(dev => dev.id === deviceId);
-
-		device = deviceConf.name;
-		var title = deviceConf.title
-		if (title) {
-			evt.title = title;
-		}
-		var command = deviceConf.command;
-		if (command) {
-			evt.command = command
-		}
+	if (deviceConf instanceof Object) {
+		if (deviceConf.friendlyName !== undefined)
+			topicEntity = deviceConf.friendlyName;
+	}
 
 	var json = JSON.stringify(evt, null, 2)
-	mqttClient.publish(topic + "/" + deviceId, json, { qos: qos, retain: config.mqtt.retain }, (error) => {
+	mqttClient.publish(topic + "/" + topicEntity, json, { qos: qos, retain: config.mqtt.retain }, (error) => {
 		if (error) {
 			console.error(error)
 		}
