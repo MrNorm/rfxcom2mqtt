@@ -49,5 +49,5 @@ devices:
   - friendlyName: '071a000000000a03'
     id: "0x00000A/3"
     options: {
-      'venetian_blind_mode': 'EU'
+      'venetian_blind_mode': 'US'
     }
