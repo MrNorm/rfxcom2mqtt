@@ -147,19 +147,14 @@ mqttClient.on('message', (topic, message) => {
     console.log(dn[2], ' is not a valid device');
     return;
   }
-  if (!validRfxcomDeviceFunction(dn[2], dn[3])) {
-    console.log(dn[3], ' is not a valid device function on ', dn[2]);
-    return;
-  }
-
-  const deviceFunction = dn[3];
   let deviceType = dn[2];
-  let entityName = dn[4];
+  let entityName = dn[3];
   let subType;
+  let deviceFunction;
 
   // Used for units and forms part of the device id
-  if (dn[5] !== undefined && dn[5].length > 0) {
-    entityName = entityName + '/' + dn[5];
+  if (dn[4] !== undefined && dn[4].length > 0) {
+    entityName = entityName + '/' + dn[4];
   }
 
   // We will need subType from payload
@@ -167,6 +162,14 @@ mqttClient.on('message', (topic, message) => {
     subType = payload.subType;
   }
 
+  if (payload.deviceFunction !== undefined) {
+    deviceFunction = payload.deviceFunction;
+  }
+
+  if (!validRfxcomDeviceFunction(deviceType, payload.deviceFunction)) {
+    console.log(payload.deviceFunction, ' is not a valid device function on ', deviceType);
+    return;
+  }
   // We may also get a value from the payload to use in the device function
   const value = payload.value;
   let deviceOptions = payload.deviceOptions;
