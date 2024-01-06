@@ -14,18 +14,6 @@ rfxcom:
   debug: false
   transmit:
     repeat: 4
-    lighting1:
-      - X10
-      - ARC
-      - ELRO
-      - PHILIPS_SBC
-    lighting2:
-      - AC
-      - HOMEEASY_EU
-    lighting3:
-      - KOPPLA
-    lighting4:
-      - PT2262
   receive:
     - temperaturehumidity1
     - homeconfort
