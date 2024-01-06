@@ -126,8 +126,9 @@ rfxtrx.initialise(function(error) {
 });
 
 // RFXCOM Transmit
-mqttClient.on('message', (topic, payload) => {
+mqttClient.on('message', (topic, message) => {
   let transmitRepetitions;
+  const payload = JSON.parse(message);
 
   if (debug) {
     console.log('MQTT in:', topic, ' ', payload.toString());
